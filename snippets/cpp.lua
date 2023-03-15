@@ -16,59 +16,8 @@ local func = ls.function_node
 local snippets, autosnippets = {}, {} --}}}
 
 local group = vim.api.nvim_create_augroup("Cpp Snippets", { clear = true })
-local file_pattern = "*.js"
+local file_pattern = "*.cpp"
 
-local function cs(trigger, nodes, opts) --{{{
-	local snippet = s(trigger, nodes)
-	local target_table = snippets
-
-	local pattern = file_pattern
-	local keymaps = {}
-
-	if opts ~= nil then
-		-- check for custom pattern
-		if opts.pattern then
-			pattern = opts.pattern
-		end
-
-		-- if opts is a string
-		if type(opts) == "string" then
-			if opts == "auto" then
-				target_table = autosnippets
-			else
-				table.insert(keymaps, { "i", opts })
-			end
-		end
-
-		-- if opts is a table
-		if opts ~= nil and type(opts) == "table" then
-			for _, keymap in ipairs(opts) do
-				if type(keymap) == "string" then
-					table.insert(keymaps, { "i", keymap })
-				else
-					table.insert(keymaps, keymap)
-				end
-			end
-		end
-
-		-- set autocmd for each keymap
-		if opts ~= "auto" then
-			for _, keymap in ipairs(keymaps) do
-				vim.api.nvim_create_autocmd("BufEnter", {
-					pattern = pattern,
-					group = group,
-					callback = function()
-						vim.keymap.set(keymap[1], keymap[2], function()
-							ls.snip_expand(snippet)
-						end, { noremap = true, silent = true, buffer = true })
-					end,
-				})
-			end
-		end
-	end
-
-	table.insert(target_table, snippet) -- insert snippet into appropriate table
-end --}}}
 
 --All Snippets
 
@@ -139,24 +88,24 @@ int32_t main(){{
     )
 )
 
-local if_statement = s("if", fmt(
-    [[
-if({}){}
-    ]],
-{
-    i(1, ""),
-    i(2, ""),
-})
-)
-table.insert(autosnippets, if_statement)
+-- local if_statement = s("if", fmt(
+--     [[
+-- if({}){}
+--     ]],
+-- {
+--     i(1, ""),
+--     i(2, ""),
+-- })
+-- )
+-- table.insert(autosnippets, if_statement)
 
 
 local For_satement = s( -- for([%w_]) CPP For Loop snippet{{{
 	{ trig = "for([%w_])", regTrig = true, hidden = true },
 	fmt(
 		[[
-for(int {} = 0; {} < {}; {}++) {{
-  {}
+for(int {} = 0; {} < {}; {}++){{
+    {}
 }}
     ]],
 		{
@@ -170,27 +119,88 @@ for(int {} = 0; {} < {}; {}++) {{
 		}
 	)
 ) --}}}
-local While_staement = s( -- [while] CPP While Loop snippet{{{
-	"while",
-	fmt(
-		[[
-while({}){{
-  {}
-}}
-  ]],
-		{
-			i(1, ""),
-			i(2, ""),
-		}
-	)
-) --}}}
-cs("cl", { t("console.log("), i(1, ""), t(")") }, { "jcl", "jj" }) -- console.log
+-- local While_staement = s( -- [while] CPP While Loop snippet{{{
+-- 	"while",
+-- 	fmt(
+-- 		[[
+-- while({}){{
+--     {}
+-- }}
+--   ]],
+-- 		{
+-- 			i(1, ""),
+-- 			i(2, ""),
+-- 		}
+-- 	)
+-- ) --}}}
 table.insert(autosnippets, For_satement)
-table.insert(autosnippets, While_staement)
+-- table.insert(autosnippets, While_staement)
 table.insert(autosnippets, cp)
 table.insert(autosnippets, Cp)
 table.insert(autosnippets, Date)
 table.insert(autosnippets, myFirstSnippet)
+
+local graph_class = s("graph_class", fmt(
+[[
+struct Edge{{
+	int src;
+	int des;
+}};
+
+struct Graph{{
+	vector< vector<int> > adjList;
+	Graph(const vector<Edge> &edges, int n){{
+		adjList.resize(n);
+		for(const Edge& i:edges){{
+			adjList[i.src].push_back(i.des);
+			adjList[i.des].push_back(i.src);
+		}}
+	}}
+	Graph(const vector<vector<int>> &adjlist){{
+		adjList = adjlist;
+	}}
+}};
+{}
+]],
+{
+    i(1, ""),
+}
+))
+
+table.insert(snippets, graph_class)
+
+local bfs_algorithm = s("bfs_algorithm", fmt(
+[[
+vector<bool>visited(1000,false);
+
+vector<int> bfs(const Graph &graph, int start, int target = -1){{
+	int n = graph.adjList.size();
+	vector<int>order;
+	queue<int>q;
+	q.push(start);
+	visited[start] = true;
+	while(!q.empty()){{
+		int u = q.front();
+		q.pop();
+		order.push_back(u);
+		for(int i:graph.adjList[u]){{
+			if(!visited[i]){{
+				visited[i] = true;
+				q.push(i);
+			}}
+		}}
+	}}
+	if(target!=-1){{
+		if(!visited[target]) return {{}};
+	}}
+	return order;
+}}
+{}
+]],
+{
+    i(1, ""),
+}
+))
 
 -- End Refactoring --
 

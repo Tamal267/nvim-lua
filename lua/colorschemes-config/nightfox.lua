@@ -1,1 +1,1 @@
---require('nightfox').load('carbonfox')
+require('nightfox').load('nordfox')

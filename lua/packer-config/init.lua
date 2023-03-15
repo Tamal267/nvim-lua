@@ -1,7 +1,7 @@
 return require'packer'.startup(function()
     use 'wbthomason/packer.nvim'
+    use "EdenEast/nightfox.nvim" -- Packer
     use 'nvim-tree/nvim-web-devicons'
---    use "EdenEast/nightfox.nvim"
     use 'nvim-tree/nvim-tree.lua'
     use 'neovim/nvim-lspconfig'
     use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
@@ -17,4 +17,18 @@ return require'packer'.startup(function()
     use {
         "terrortylor/nvim-comment"
     }
+    use("nvim-lualine/lualine.nvim") --> a statusline written in lua
+    -- cpp highlight
+    use 'octol/vim-cpp-enhanced-highlight'
+    use 'https://github.com/terryma/vim-multiple-cursors' -- CTRL + N for multiple cursors
+
+    use({
+    "kylechui/nvim-surround",
+    tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+    config = function()
+        require("nvim-surround").setup({
+            -- Configuration here, or leave empty to use defaults
+        })
+    end
+})
 end)
